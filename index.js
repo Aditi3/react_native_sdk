@@ -383,7 +383,7 @@ AdjustConfig.EventTrackingFailedCallback = null;
 AdjustConfig.SessionTrackingSucceededCallback = null;
 AdjustConfig.SessionTrackingFailedCallback = null;
 AdjustConfig.DeferredDeeplinkCallback = null;
-AdjustConfig.SkanUpdatedCallback = null
+AdjustConfig.SkanUpdatedCallback = null;
 
 // common
 
