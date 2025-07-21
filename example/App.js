@@ -6,362 +6,451 @@
  * @flow strict-local
  */
 
- import React from 'react';
- import {
-   SafeAreaView,
-   StyleSheet,
-   ScrollView,
-   View,
-   Text,
-   StatusBar,
-   TouchableHighlight,
-   Platform,
- } from 'react-native';
- import {
-   Header,
-   LearnMoreLinks,
-   Colors,
-   DebugInstructions,
-   ReloadInstructions,
- } from 'react-native/Libraries/NewAppScreen';
- import {
-   Adjust,
-   AdjustEvent,
-   AdjustConfig,
-   AdjustDeeplink
- } from 'react-native-adjust';
- import { AdjustOaid } from 'react-native-adjust-oaid';
- 
- const App: () => React$Node = () => {
-   Adjust.getSdkVersion(function(sdkVersion) {
-     console.log("Adjust SDK version: " + sdkVersion);
-   });
- 
-   const adjustConfig = new AdjustConfig("2fm9gkqubvpc", AdjustConfig.EnvironmentSandbox);
-   adjustConfig.setLogLevel(AdjustConfig.LogLevelVerbose);
-   // adjustConfig.disableSkanAttribution();
-   // adjustConfig.enableCoppaCompliance();
-   // adjustConfig.setAttConsentWaitingInterval(16);
- 
-   adjustConfig.setAttributionCallback(function(attribution) {
-     console.log("Attribution callback received");
-     console.log("Tracker token = " + attribution.trackerToken);
-     console.log("Tracker name = " + attribution.trackerName);
-     console.log("Network = " + attribution.network);
-     console.log("Campaign = " + attribution.campaign);
-     console.log("Adgroup = " + attribution.adgroup);
-     console.log("Creative = " + attribution.creative);
-     console.log("Click label = " + attribution.clickLabel);
-     console.log("Cost type = " + attribution.costType);
-     console.log("Cost amount = " + attribution.costAmount);
-     console.log("Cost currency = " + attribution.costCurrency);
-   });
- 
-   adjustConfig.setEventTrackingSucceededCallback(function(eventSuccess) {
-     console.log("Event tracking succeeded callback received");
-     console.log("Message: " + eventSuccess.message);
-     console.log("Timestamp: " + eventSuccess.timestamp);
-     console.log("Adid: " + eventSuccess.adid);
-     console.log("Event token: " + eventSuccess.eventToken);
-     console.log("Callback Id: " + eventSuccess.callbackId);
-     console.log("JSON response: " + eventSuccess.jsonResponse);
-   });
- 
-   adjustConfig.setEventTrackingFailedCallback(function(eventFailed) {
-     console.log("Event tracking failed callback received");
-     console.log("Message: " + eventFailed.message);
-     console.log("Timestamp: " + eventFailed.timestamp);
-     console.log("Adid: " + eventFailed.adid);
-     console.log("Event token: " + eventFailed.eventToken);
-     console.log("Callback Id: " + eventFailed.callbackId);
-     console.log("Will retry: " + eventFailed.willRetry);
-     console.log("JSON response: " + eventFailed.jsonResponse);
-   });
- 
-   adjustConfig.setSessionTrackingSucceededCallback(function(sessionSuccess) {
-     console.log("Session tracking succeeded callback received");
-     console.log("Message: " + sessionSuccess.message);
-     console.log("Timestamp: " + sessionSuccess.timestamp);
-     console.log("Adid: " + sessionSuccess.adid);
-     console.log("JSON response: " + sessionSuccess.jsonResponse);
-   });
- 
-   adjustConfig.setSessionTrackingFailedCallback(function(sessionFailed) {
-     console.log("Session tracking failed callback received");
-     console.log("Message: " + sessionFailed.message);
-     console.log("Timestamp: " + sessionFailed.timestamp);
-     console.log("Adid: " + sessionFailed.adid);
-     console.log("Will retry: " + sessionFailed.willRetry);
-     console.log("JSON response: " + sessionFailed.jsonResponse);
-   });
- 
-   adjustConfig.setDeferredDeeplinkCallback(function(deeplink) {
-     console.log("Deferred Deeplink Callback received");
-     console.log("Deeplink: " + deeplink.deeplink);
-   });
- 
-   adjustConfig.setSkanUpdatedCallback(function(skanData) {
-     console.log("Skan Data updated callback received");
-     console.log("Conversion value: " + skanData.conversionValue);
-     console.log("Coarse value: " + skanData.coarseValue);
-     console.log("Lock window: " + skanData.lockWindow);
-     console.log("Error: " + skanData.error);
-   });
- 
-   Adjust.addGlobalCallbackParameter("scpk1", "scpv1");
-   Adjust.addGlobalCallbackParameter("scpk2", "scpv2");
- 
-   Adjust.addGlobalPartnerParameter("sppk1", "sppv1");
-   Adjust.addGlobalPartnerParameter("sppk2", "sppv2");
- 
-   Adjust.removeGlobalCallbackParameter("scpk1");
-   Adjust.removeGlobalPartnerParameter("sppk2");
- 
-   // Adjust.removeGlobalCallbackParameters();
-   // Adjust.removeGlobalPartnerParameters();
- 
-   Adjust.requestAppTrackingAuthorization(function(status) {
-     console.log("Authorization status update");
-     switch (status) {
-       case 0:
-         // ATTrackingManagerAuthorizationStatusNotDetermined case
-         console.log("Authorization status: ATTrackingManagerAuthorizationStatusNotDetermined");
-         break;
-       case 1:
-         // ATTrackingManagerAuthorizationStatusRestricted case
-         console.log("Authorization status: ATTrackingManagerAuthorizationStatusRestricted");
-         break;
-       case 2:
-         // ATTrackingManagerAuthorizationStatusDenied case
-         console.log("Authorization status: ATTrackingManagerAuthorizationStatusDenied");
-         break;
-       case 3:
-         // ATTrackingManagerAuthorizationStatusAuthorized case
-         console.log("Authorization status: ATTrackingManagerAuthorizationStatusAuthorized");
-         break;
-     }
-   });
- 
-   if (Platform.OS === "android") {
-     AdjustOaid.readOaid();
-   }
-   Adjust.initSdk(adjustConfig);
- 
-   function componentDidMount() {
-     Linking.addEventListener('url', this.handleDeepLink);
-     Linking.getInitialURL().then((url) => {
-       if (url) {
-         this.handleDeepLink({ url });
-       }
-     })
-   }
- 
-   function componentWillUnmount() {
-     Adjust.componentWillUnmount();
-     Linking.removeEventListener('url', this.handleDeepLink);
-   }
- 
-   function handleDeepLink(e) {
-     Adjust.processDeeplink(new AdjustDeeplink(e.url));
-   }
- 
-   function _onPress_trackSimpleEvent() {
-     var adjustEvent = new AdjustEvent("g3mfiw");
-     Adjust.trackEvent(adjustEvent);
-     Adjust.getAppTrackingAuthorizationStatus(function(status) {
-       console.log("Authorization status = " + status);
-     });
-   }
- 
-   function _onPress_trackRevenueEvent() {
-     var adjustEvent = new AdjustEvent("a4fd35");
-     adjustEvent.setRevenue(10.0, "USD");
-     adjustEvent.setTransactionId("DUMMY_TRANSACTION_ID");
-     Adjust.trackEvent(adjustEvent);
-   }
- 
-   function _onPress_trackCallbackEvent() {
-     var adjustEvent = new AdjustEvent("34vgg9");
-     adjustEvent.addCallbackParameter("DUMMY_KEY_1", "DUMMY_VALUE_1");
-     adjustEvent.addCallbackParameter("DUMMY_KEY_2", "DUMMY_VALUE_2");
-     Adjust.trackEvent(adjustEvent);
-   }
- 
-   function _onPress_trackPartnerEvent() {
-     var adjustEvent = new AdjustEvent("w788qs");
-     adjustEvent.addPartnerParameter("DUMMY_KEY_1", "DUMMY_VALUE_1");
-     adjustEvent.addPartnerParameter("DUMMY_KEY_2", "DUMMY_VALUE_2");
-     Adjust.trackEvent(adjustEvent);
-   }
- 
-   function _onPress_enableOfflineMode() {
-     Adjust.switchToOfflineMode();
-   }
- 
-   function _onPress_disableOfflineMode() {
-     Adjust.switchBackToOnlineMode();
-   }
- 
-   function _onPress_enableSdk() {
-     Adjust.enable();
-   }
- 
-   function _onPress_disableSdk() {
-     Adjust.disable();
-   }
- 
-   function _onPress_getIds() {
-     Adjust.getAdid((adid) => {
-       console.log("Adid = " + adid);
-     });
- 
-     Adjust.getIdfa((idfa) => {
-       console.log("IDFA = " + idfa);
-     });
- 
-     Adjust.getIdfv((idfv) => {
-       console.log("IDFV = " + idfv);
-     });
- 
-     Adjust.getGoogleAdId((googleAdId) => {
-       console.log("Google Ad Id = " + googleAdId);
-     });
- 
-     Adjust.getAmazonAdId((amazonAdId) => {
-       console.log("Amazon Ad Id = " + amazonAdId);
-     });
- 
-     Adjust.getAttribution((attribution) => {
-       console.log("Attribution:");
-       console.log("Tracker token = " + attribution.trackerToken);
-       console.log("Tracker name = " + attribution.trackerName);
-       console.log("Network = " + attribution.network);
-       console.log("Campaign = " + attribution.campaign);
-       console.log("Adgroup = " + attribution.adgroup);
-       console.log("Creative = " + attribution.creative);
-       console.log("Click label = " + attribution.clickLabel);
-     });
-   }
- 
-   function _onPress_isSdkEnabled() {
-     Adjust.isEnabled((isEnabled) => {
-       if (isEnabled) {
-         console.log("SDK is enabled");
-       } else {
-         console.log("SDK is disabled");
-       }
-     });
-   }
- 
-   return (
-     <>
-       <View style={styles.container}>
-         <TouchableHighlight
-           style={styles.button}
-           onPress={_onPress_trackSimpleEvent}>
-           <Text>Track Simple Event</Text>
-         </TouchableHighlight>
-         <TouchableHighlight
-           style={styles.button}
-           onPress={_onPress_trackRevenueEvent}>
-           <Text>Track Revenue Event</Text>
-         </TouchableHighlight>
-         <TouchableHighlight
-           style={styles.button}
-           onPress={_onPress_trackCallbackEvent}>
-           <Text>Track Callback Event</Text>
-         </TouchableHighlight>
-         <TouchableHighlight
-           style={styles.button}
-           onPress={_onPress_trackPartnerEvent}>
-           <Text>Track Partner Event</Text>
-         </TouchableHighlight>
-         <TouchableHighlight
-           style={styles.button}
-           onPress={_onPress_enableOfflineMode}>
-           <Text>Enable Offline Mode</Text>
-         </TouchableHighlight>
-         <TouchableHighlight
-           style={styles.button}
-           onPress={_onPress_disableOfflineMode}>
-           <Text>Disable Offline Mode</Text>
-         </TouchableHighlight>
-         <TouchableHighlight
-           style={styles.button}
-           onPress={_onPress_enableSdk}>
-           <Text>Enable SDK</Text>
-         </TouchableHighlight>
-         <TouchableHighlight
-           style={styles.button}
-           onPress={_onPress_disableSdk}>
-           <Text>Disable SDK</Text>
-         </TouchableHighlight>
-         <TouchableHighlight
-           style={styles.button}
-           onPress={_onPress_getIds}>
-           <Text>Get Ids</Text>
-         </TouchableHighlight>
-         <TouchableHighlight
-           style={styles.button}
-           onPress={_onPress_isSdkEnabled}>
-           <Text>is SDK Enabled?</Text>
-         </TouchableHighlight>
-       </View>
-     </>
-   );
- };
- 
- const styles = StyleSheet.create({
-   scrollView: {
-     backgroundColor: Colors.lighter,
-   },
-   engine: {
-     position: 'absolute',
-     right: 0,
-   },
-   body: {
-     backgroundColor: Colors.white,
-   },
-   sectionContainer: {
-     marginTop: 32,
-     paddingHorizontal: 24,
-   },
-   sectionTitle: {
-     fontSize: 24,
-     fontWeight: '600',
-     color: Colors.black,
-   },
-   sectionDescription: {
-     marginTop: 8,
-     fontSize: 18,
-     fontWeight: '400',
-     color: Colors.dark,
-   },
-   highlight: {
-     fontWeight: '700',
-   },
-   footer: {
-     color: Colors.dark,
-     fontSize: 12,
-     fontWeight: '600',
-     padding: 4,
-     paddingRight: 12,
-     textAlign: 'right',
-   },
-   container: {
-     flex: 1,
-     justifyContent: 'center',
-     alignItems: 'center',
-     backgroundColor: '#F5FCFF',
-   },
-   button: {
-     alignItems: 'center',
-     backgroundColor: '#61D4FB',
-     padding: 10,
-     width: '60%',
-     height: 40,
-     margin: 10,
-   },
- });
- 
- export default App;
+import React from 'react';
+import {
+  SafeAreaView,
+  StyleSheet,
+  ScrollView,
+  View,
+  Text,
+  StatusBar,
+  TouchableOpacity,
+  Platform,
+  Alert,
+  Linking,
+} from 'react-native';
+import {
+  Adjust,
+  AdjustEvent,
+  AdjustConfig,
+  AdjustDeeplink
+} from 'react-native-adjust';
+import { AdjustOaid } from 'react-native-adjust-oaid';
+
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+    
+    this.state = {
+      toggleButtonText: 'Toggle SDK'
+    };
+
+    // Initialize the Adjust SDK
+    this.initializeAdjustSdk();
+  }
+
+  initializeAdjustSdk = () => {
+    console.log("[AdjustExample]: Initializing SDK...");
+    
+    const adjustConfig = new AdjustConfig("2fm9gkqubvpc", AdjustConfig.EnvironmentSandbox);
+    adjustConfig.setLogLevel(AdjustConfig.LogLevelVerbose);
+    
+    adjustConfig.setAttributionCallback(function(attribution) {
+      console.log("Attribution callback received");
+      console.log("Tracker token = " + attribution.trackerToken);
+      console.log("Tracker name = " + attribution.trackerName);
+      console.log("Campaign = " + attribution.campaign);
+      console.log("Network = " + attribution.network);
+      console.log("Creative = " + attribution.creative);
+      console.log("Adgroup = " + attribution.adgroup);
+      console.log("Click label = " + attribution.clickLabel);
+      console.log("Cost type = " + attribution.costType);
+      console.log("Cost amount = " + attribution.costAmount);
+      console.log("Cost currency = " + attribution.costCurrency);
+      console.log("JSON response = " + attribution.jsonResponse);
+    });
+
+    adjustConfig.setSessionTrackingSucceededCallback(function(sessionSuccess) {
+      console.log("Session success callback received");
+      console.log("Message: " + sessionSuccess.message);
+      console.log("Timestamp: " + sessionSuccess.timestamp);
+      console.log("Adid: " + sessionSuccess.adid);
+      console.log("JSON response: " + sessionSuccess.jsonResponse);
+    });
+
+    adjustConfig.setSessionTrackingFailedCallback(function(sessionFailure) {
+      console.log("Session failure callback received");
+      console.log("Message: " + sessionFailure.message);
+      console.log("Timestamp: " + sessionFailure.timestamp);
+      console.log("Adid: " + sessionFailure.adid);
+      console.log("Will retry: " + sessionFailure.willRetry);
+      console.log("JSON response: " + sessionFailure.jsonResponse);
+    });
+
+    adjustConfig.setEventTrackingSucceededCallback(function(eventSuccess) {
+      console.log("Event success callback received");
+      console.log("Event token: " + eventSuccess.eventToken);
+      console.log("Message: " + eventSuccess.message);
+      console.log("Timestamp: " + eventSuccess.timestamp);
+      console.log("Adid: " + eventSuccess.adid);
+      console.log("Callback ID: " + eventSuccess.callbackId);
+      console.log("JSON response: " + eventSuccess.jsonResponse);
+    });
+
+    adjustConfig.setEventTrackingFailedCallback(function(eventFailure) {
+      console.log("Event failure callback received");
+      console.log("Event token: " + eventFailure.eventToken);
+      console.log("Message: " + eventFailure.message);
+      console.log("Timestamp: " + eventFailure.timestamp);
+      console.log("Adid: " + eventFailure.adid);
+      console.log("Callback ID: " + eventFailure.callbackId);
+      console.log("Will retry: " + eventFailure.willRetry);
+      console.log("JSON response: " + eventFailure.jsonResponse);
+    });
+
+    adjustConfig.setDeferredDeeplinkCallback(function(deeplink) {
+      console.log("Received deferred deeplink: " + deeplink.deeplink);
+    });
+
+    adjustConfig.setSkanUpdatedCallback(function(skanData) {
+      console.log("Received SKAN update information:");
+      if (skanData.conversionValue != null) {
+        console.log("Conversion value: " + skanData.conversionValue);
+      }
+      if (skanData.coarseValue != null) {
+        console.log("Coarse value: " + skanData.coarseValue);
+      }
+      if (skanData.lockWindow != null) {
+        console.log("Lock window: " + skanData.lockWindow);
+      }
+      if (skanData.error != null) {
+        console.log("Error: " + skanData.error);
+      }
+    });
+
+    Adjust.requestAppTrackingAuthorization(function(status) {
+      console.log("Authorization status update");
+      switch (status) {
+        case 0:
+          console.log("Authorization status: ATTrackingManagerAuthorizationStatusNotDetermined");
+          break;
+        case 1:
+          console.log("Authorization status: ATTrackingManagerAuthorizationStatusRestricted");
+          break;
+        case 2:
+          console.log("Authorization status: ATTrackingManagerAuthorizationStatusDenied");
+          break;
+        case 3:
+          console.log("Authorization status: ATTrackingManagerAuthorizationStatusAuthorized");
+          break;
+      }
+    });
+
+    if (Platform.OS === "android") {
+      AdjustOaid.readOaid();
+    }
+    
+    Adjust.initSdk(adjustConfig);
+    console.log("[AdjustExample]: SDK initialized successfully");
+  };
+
+  componentDidMount() {
+    // Deep link handling
+    Linking.addEventListener('url', this.handleDeepLink);
+    
+    Linking.getInitialURL().then((url) => {
+      if (url) {
+        this.handleDeepLink({ url });
+      }
+    }).catch(err => {
+      console.log('[AdjustExample]: Error getting initial URL:', err);
+    });
+
+    // Update toggle button text
+    setTimeout(() => {
+      try {
+        Adjust.isEnabled((isEnabled) => {
+          this.setState({
+            toggleButtonText: isEnabled ? 'Disable SDK' : 'Enable SDK'
+          });
+        });
+      } catch (error) {
+        console.log("[AdjustExample]: Could not check SDK state");
+      }
+    }, 1000);
+  }
+
+  componentWillUnmount() {
+    Adjust.componentWillUnmount();
+    Linking.removeEventListener('url', this.handleDeepLink);
+  }
+
+  handleDeepLink = (e) => {
+    Adjust.processDeeplink(new AdjustDeeplink(e.url));
+  };
+
+  trackSimpleEvent = () => {
+    const adjustEvent = new AdjustEvent('g3mfiw');
+    Adjust.trackEvent(adjustEvent);
+    console.log("Simple event tracked");
+  };
+
+  trackRevenueEvent = () => {
+    const adjustEvent = new AdjustEvent('a4fd35');
+    adjustEvent.setRevenue(100.0, "EUR");
+    adjustEvent.setTransactionId("DummyTransactionId");
+    Adjust.trackEvent(adjustEvent);
+    console.log("Revenue event tracked");
+  };
+
+  trackCallbackEvent = () => {
+    const adjustEvent = new AdjustEvent('34vgg9');
+    adjustEvent.addCallbackParameter("key1", "value1");
+    adjustEvent.addCallbackParameter("key2", "value2");
+    Adjust.trackEvent(adjustEvent);
+    console.log("Callback event tracked");
+  };
+
+  trackPartnerEvent = () => {
+    const adjustEvent = new AdjustEvent('w788qs');
+    adjustEvent.addPartnerParameter("foo1", "bar1");
+    adjustEvent.addPartnerParameter("foo2", "bar2");
+    Adjust.trackEvent(adjustEvent);
+    console.log("Partner event tracked");
+  };
+
+  getGoogleAdId = () => {
+    Adjust.getGoogleAdId((googleAdId) => {
+      Alert.alert('Google Advertising ID', `Received Google Advertising Id:\n${googleAdId}`);
+    });
+  };
+
+  getAdjustIdentifier = () => {
+    Adjust.getAdid((adid) => {
+      Alert.alert('Adjust Identifier', `Received Adjust identifier:\n${adid}`);
+    });
+  };
+
+  getIdfa = () => {
+    Adjust.getIdfa((idfa) => {
+      Alert.alert('IDFA', `Received IDFA:\n${idfa}`);
+    });
+  };
+
+  getAttribution = () => {
+    Adjust.getAttribution((attribution) => {
+      let attributionInfo = 'Attribution data:\n\n';
+      if (attribution.trackerToken != null) {
+        attributionInfo += `Tracker token: ${attribution.trackerToken}\n`;
+      }
+      if (attribution.trackerName != null) {
+        attributionInfo += `Tracker name: ${attribution.trackerName}\n`;
+      }
+      if (attribution.campaign != null) {
+        attributionInfo += `Campaign: ${attribution.campaign}\n`;
+      }
+      if (attribution.network != null) {
+        attributionInfo += `Network: ${attribution.network}\n`;
+      }
+      Alert.alert('Attribution', attributionInfo);
+    });
+  };
+
+  toggleSdkState = () => {
+    try {
+      Adjust.isEnabled((isEnabled) => {
+        if (isEnabled) {
+          Adjust.disable();
+          Alert.alert('SDK State', 'Adjust SDK has been disabled');
+          this.setState({ toggleButtonText: 'Enable SDK' });
+        } else {
+          Adjust.enable();
+          Alert.alert('SDK State', 'Adjust SDK has been enabled');
+          this.setState({ toggleButtonText: 'Disable SDK' });
+        }
+      });
+    } catch (error) {
+      Alert.alert('Toggle SDK', 'No such method found in plugin: isEnabled');
+    }
+  };
+
+  checkIfSdkEnabled = () => {
+    try {
+      Adjust.isEnabled((isEnabled) => {
+        Alert.alert('SDK Enabled?', `Adjust is enabled = ${isEnabled}`);
+      });
+    } catch (error) {
+      Alert.alert('SDK Enabled?', 'No such method found in plugin: isEnabled');
+    }
+  };
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <SafeAreaView style={styles.safeArea}>
+          <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+            {/* Header Section */}
+            <View style={styles.headerSection}>
+              <View style={styles.appIcon}>
+                <Text style={styles.iconText}>📊</Text>
+              </View>
+              <Text style={styles.appTitle}>Adjust SDK Demo</Text>
+              <Text style={styles.appDescription}>
+                Explore the full functionality of the Adjust SDK{'\n'}with this example application
+              </Text>
+            </View>
+            
+            <View style={styles.headerSpacing} />
+            
+            {/* Event Tracking Section */}
+            <Text style={styles.sectionHeader}>Event Tracking</Text>
+            <View style={styles.buttonSpacing} />
+            
+            <TouchableOpacity style={styles.actionButton} onPress={this.trackSimpleEvent}>
+              <Text style={styles.actionButtonText}>Track Simple Event</Text>
+            </TouchableOpacity>
+            <View style={styles.smallSpacing} />
+            
+            <TouchableOpacity style={styles.actionButton} onPress={this.trackRevenueEvent}>
+              <Text style={styles.actionButtonText}>Track Revenue Event</Text>
+            </TouchableOpacity>
+            <View style={styles.smallSpacing} />
+            
+            <TouchableOpacity style={styles.actionButton} onPress={this.trackCallbackEvent}>
+              <Text style={styles.actionButtonText}>Track Callback Event</Text>
+            </TouchableOpacity>
+            <View style={styles.smallSpacing} />
+            
+            <TouchableOpacity style={styles.actionButton} onPress={this.trackPartnerEvent}>
+              <Text style={styles.actionButtonText}>Track Partner Event</Text>
+            </TouchableOpacity>
+            
+            <View style={styles.sectionSpacing} />
+            
+            {/* Device Information Section */}
+            <Text style={styles.sectionHeader}>Device Information</Text>
+            <View style={styles.buttonSpacing} />
+            
+            <TouchableOpacity style={styles.actionButton} onPress={this.getGoogleAdId}>
+              <Text style={styles.actionButtonText}>Get Google AdId</Text>
+            </TouchableOpacity>
+            <View style={styles.smallSpacing} />
+            
+            <TouchableOpacity style={styles.actionButton} onPress={this.getAdjustIdentifier}>
+              <Text style={styles.actionButtonText}>Get Adjust Identifier</Text>
+            </TouchableOpacity>
+            <View style={styles.smallSpacing} />
+            
+            <TouchableOpacity style={styles.actionButton} onPress={this.getIdfa}>
+              <Text style={styles.actionButtonText}>Get IDFA</Text>
+            </TouchableOpacity>
+            <View style={styles.smallSpacing} />
+            
+            <TouchableOpacity style={styles.actionButton} onPress={this.getAttribution}>
+              <Text style={styles.actionButtonText}>Get Attribution</Text>
+            </TouchableOpacity>
+            
+            <View style={styles.sectionSpacing} />
+            
+            {/* SDK Control Section */}
+            <Text style={styles.sectionHeader}>SDK Control</Text>
+            <View style={styles.buttonSpacing} />
+            
+            <TouchableOpacity style={styles.actionButton} onPress={this.toggleSdkState}>
+              <Text style={styles.actionButtonText}>{this.state.toggleButtonText}</Text>
+            </TouchableOpacity>
+            <View style={styles.smallSpacing} />
+            
+            <TouchableOpacity style={styles.actionButton} onPress={this.checkIfSdkEnabled}>
+              <Text style={styles.actionButtonText}>Is SDK Enabled?</Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </SafeAreaView>
+      </View>
+    );
+  }
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#1B2951',
+  },
+  safeArea: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: 20,
+    paddingBottom: 40,
+  },
+  
+  // Header styles
+  headerSection: {
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  appIcon: {
+    width: 80,
+    height: 80,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  iconText: {
+    fontSize: 40,
+  },
+  appTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: 'white',
+    marginBottom: 8,
+  },
+  appDescription: {
+    fontSize: 16,
+    color: 'rgba(255, 255, 255, 0.8)',
+    textAlign: 'center',
+    lineHeight: 22,
+  },
+  
+  // Section header styles
+  sectionHeader: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: 'white',
+    marginBottom: 0,
+  },
+  
+  // Button styles
+  actionButton: {
+    width: '100%',
+    height: 56,
+    backgroundColor: 'white',
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  actionButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1B2951',
+  },
+  
+  // Spacing styles
+  headerSpacing: {
+    height: 32,
+  },
+  sectionSpacing: {
+    height: 32,
+  },
+  buttonSpacing: {
+    height: 16,
+  },
+  smallSpacing: {
+    height: 12,
+  },
+});
+
+export default App;
