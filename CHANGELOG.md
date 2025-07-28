@@ -1,3 +1,17 @@
+### Version 5.4.1 (28th July 2025)
+#### Added
+- Added support for Google On-Device-Measurement. For more details about this feature, refer to the [official documentation](https://dev.adjust.com/en/sdk/react-native/plugins/google-odm).
+- Optimized the logic behind the `processAndResolveDeeplink` method to immediately return links that have already been resolved.
+
+#### Changed
+- Updated the Adjust Signature library version to 3.47.0.
+
+#### Native SDKs
+- [iOS@v5.4.1][ios_sdk_v5.4.1]
+- [Android@v5.4.1][android_sdk_v5.4.1]
+
+----
+
 ### Version 5.4.0 (18th June 2025)
 #### Added
 - Added support for configuring store information via the `AdjustStoreInfo` object. You can now specify the store name and store app ID via `setStoreInfo` method on your `AdjustConfig` instance. This enables the SDK to record the intended app store source during initialization. For more details about this feature, refer to the [official documentation](https://dev.adjust.com/en/sdk/react-native/setup/store-type).
@@ -749,6 +763,7 @@ In case you were using beta version of the SDK v5, please switch to the official
 [ios_sdk_v5.0.2]: https://github.com/adjust/ios_sdk/tree/v5.0.2
 [ios_sdk_v5.1.1]: https://github.com/adjust/ios_sdk/tree/v5.1.1
 [ios_sdk_v5.4.0]: https://github.com/adjust/ios_sdk/tree/v5.4.0
+[ios_sdk_v5.4.1]: https://github.com/adjust/ios_sdk/tree/v5.4.1
 
 [android_sdk_v4.10.4]: https://github.com/adjust/android_sdk/tree/v4.10.4
 [android_sdk_v4.11.0]: https://github.com/adjust/android_sdk/tree/v4.11.0
@@ -791,3 +806,4 @@ In case you were using beta version of the SDK v5, please switch to the official
 [android_sdk_v5.0.2]: https://github.com/adjust/android_sdk/tree/v5.0.2
 [android_sdk_v5.1.0]: https://github.com/adjust/android_sdk/tree/v5.1.0
 [android_sdk_v5.4.0]: https://github.com/adjust/android_sdk/tree/v5.4.0
+[android_sdk_v5.4.1]: https://github.com/adjust/android_sdk/tree/v5.4.1

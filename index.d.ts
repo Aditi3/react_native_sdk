@@ -224,15 +224,15 @@ declare module 'react-native-adjust' {
     removeGlobalCallbackParameters: () => void
     removeGlobalPartnerParameters: () => void
     gdprForgetMe: () => void
-    getIdfa: (callback: (idfa: string) => void) => void
-    getIdfv: (callback: (idfv: string) => void) => void
-    getGoogleAdId: (callback: (adid: string) => void) => void
+    getIdfa: (callback: (idfa: string | null) => void) => void
+    getIdfv: (callback: (idfv: string | null) => void) => void
+    getGoogleAdId: (callback: (adid: string | null) => void) => void
     getAdid: (callback: (adid: string) => void) => void
     getAttribution: (callback: (attribution: AdjustAttribution) => void) => void
-    getAmazonAdId: (callback: (adid: string) => void) => void
+    getAmazonAdId: (callback: (adid: string | null) => void) => void
     getSdkVersion: (callback: (sdkVersion: string) => void) => void
     requestAppTrackingAuthorization: (handler: (status: number) => void) => void
-    updateSkanConversionValue: (conversionValue: number, coarseValue: string, lockWindow: boolean, callback: (error: string) => void) => void
+    updateSkanConversionValue: (conversionValue: number, coarseValue: string, lockWindow: boolean, callback: (error: string | null) => void) => void
     getAppTrackingAuthorizationStatus: (callback: (status: number) => void) => void
     trackThirdPartySharing: (adjustThirdPartySharing: AdjustThirdPartySharing) => void
     trackMeasurementConsent: (measurementConsent: boolean) => void
