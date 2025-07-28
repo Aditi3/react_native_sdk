@@ -1,4 +1,4 @@
-### Version 5.4.1 (16th July 2025)
+### Version 5.4.1 (28th July 2025)
 #### Added
 - Added support for Google On-Device-Measurement. For more details about this feature, refer to the [official documentation](https://dev.adjust.com/en/sdk/react-native/plugins/google-odm).
 - Optimized the logic behind the `processAndResolveDeeplink` method to immediately return links that have already been resolved.
