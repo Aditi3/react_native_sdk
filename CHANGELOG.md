@@ -1,3 +1,13 @@
+### Version 5.4.3 (17th September 2025)
+#### Added
+- Added support for processing deferred deep links in session responses.
+
+#### Native SDKs
+- [iOS@v5.4.4][ios_sdk_v5.4.4]
+- [Android@v5.4.3][android_sdk_v5.4.3]
+
+---
+
 ### Version 5.4.2 (12th August 2025)
 #### Fixed
 - Fixed first session delay pre-init actions array lazy initialization.
@@ -778,6 +788,7 @@ In case you were using beta version of the SDK v5, please switch to the official
 [ios_sdk_v5.4.0]: https://github.com/adjust/ios_sdk/tree/v5.4.0
 [ios_sdk_v5.4.1]: https://github.com/adjust/ios_sdk/tree/v5.4.1
 [ios_sdk_v5.4.3]: https://github.com/adjust/ios_sdk/tree/v5.4.3
+[ios_sdk_v5.4.4]: https://github.com/adjust/ios_sdk/tree/v5.4.4
 
 [android_sdk_v4.10.4]: https://github.com/adjust/android_sdk/tree/v4.10.4
 [android_sdk_v4.11.0]: https://github.com/adjust/android_sdk/tree/v4.11.0
@@ -822,3 +833,4 @@ In case you were using beta version of the SDK v5, please switch to the official
 [android_sdk_v5.4.0]: https://github.com/adjust/android_sdk/tree/v5.4.0
 [android_sdk_v5.4.1]: https://github.com/adjust/android_sdk/tree/v5.4.1
 [android_sdk_v5.4.2]: https://github.com/adjust/android_sdk/tree/v5.4.2
+[android_sdk_v5.4.3]: https://github.com/adjust/android_sdk/tree/v5.4.3
