@@ -1,4 +1,4 @@
-### Version 5.4.3 (19th September 2025)
+### Version 5.4.3 (22nd September 2025)
 #### Added
 - Added support for processing deferred deep links in session responses.
 - Added support for Google License Verification (LVL). For more details about this feature, refer to the [official documentation](https://dev.adjust.com/en/sdk/react-native/plugins/google-lvl-plugin).
