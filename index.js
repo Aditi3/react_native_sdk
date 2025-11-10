@@ -53,6 +53,10 @@ Adjust.processAndResolveDeeplink = function(adjustDeeplink, callback) {
     module_adjust.processAndResolveDeeplink(adjustDeeplink, callback);
 };
 
+Adjust.resolveLinkWithUrl = function(url, resolveUrlSuffixArray, callback) {
+    module_adjust.resolveLinkWithUrl(url, resolveUrlSuffixArray, callback);
+};
+
 Adjust.setPushToken = function(token) {
     if (typeof token !== 'string') {
         console.log("[Adjust] Push token is not of type string");

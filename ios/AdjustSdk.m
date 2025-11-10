@@ -423,6 +423,21 @@ RCT_EXPORT_METHOD(processAndResolveDeeplink:(NSDictionary *)dict callback:(RCTRe
     }];
 }
 
+RCT_EXPORT_METHOD(resolveLinkWithUrl:(NSString *)url resolveUrlSuffixArray:(NSArray *)resolveUrlSuffixArray callback:(RCTResponseSenderBlock)callback) {
+    if (![self isFieldValid:url]) {
+        return;
+    }
+
+    [ADJLinkResolution resolveLinkWithUrl:[NSURL URLWithString:url] resolveUrlSuffixArray:resolveUrlSuffixArray
+                                 callback:^(NSURL *resolvedLink) {
+        if (resolvedLink == nil) {
+            callback(@[@""]);
+        } else {
+            callback(@[resolvedLink.absoluteString]);
+        }
+    }];
+}
+
 RCT_EXPORT_METHOD(setPushToken:(NSString *)token) {
     if (!([self isFieldValid:token])) {
         return;

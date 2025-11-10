@@ -628,6 +628,35 @@ public class Adjust extends ReactContextBaseJavaModule implements
     }
 
     @ReactMethod
+    public void resolveLinkWithUrl(final String url, final ReadableArray resolveUrlSuffixArray, final Callback callback) {
+        if (url == null) {
+            if (callback != null) {
+                callback.invoke("");
+            }
+            return;
+        }
+        String[] suffixArray = null;
+        if (resolveUrlSuffixArray != null && resolveUrlSuffixArray.size() > 0) {
+            int n = resolveUrlSuffixArray.size();
+            suffixArray = new String[n];
+            for (int i = 0; i < n; i++) {
+                suffixArray[i] = resolveUrlSuffixArray.getString(i);
+            }
+        }
+        com.adjust.sdk.AdjustLinkResolution.resolveLink(
+            url,
+            suffixArray,
+            new com.adjust.sdk.AdjustLinkResolution.AdjustLinkResolutionCallback() {
+                @Override
+                public void resolvedLinkCallback(Uri resolvedLink) {
+                    String resolvedUrl = resolvedLink != null ? resolvedLink.toString() : "";
+                    callback.invoke(resolvedUrl);
+                }
+            }
+        );
+    }
+
+    @ReactMethod
     public void setPushToken(final String token) {
         com.adjust.sdk.Adjust.setPushToken(token, getReactApplicationContext());
     }

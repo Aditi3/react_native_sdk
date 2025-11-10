@@ -242,6 +242,7 @@ declare module 'react-native-adjust' {
     verifyPlayStorePurchase: (purchase: AdjustPlayStorePurchase, callback: (verificationResult: AdjustPurchaseVerificationResult) => void) => void
     verifyAndTrackPlayStorePurchase: (adjustEvent: AdjustEvent, callback: (verificationResult: AdjustPurchaseVerificationResult) => void) => void
     processAndResolveDeeplink: (adjustDeeplink: AdjustDeeplink, callback: (resolvedLink: string) => void) => void
+    resolveLinkWithUrl: (url: string, resolveUrlSuffixArray: string[], callback: (resolvedLink: string) => void) => void
     endFirstSessionDelay: () => void
     enableCoppaComplianceInDelay: () => void
     disableCoppaComplianceInDelay: () => void
