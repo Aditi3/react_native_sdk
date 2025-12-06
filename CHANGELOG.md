@@ -2,6 +2,7 @@
 #### Added
 - Added `getAdidWithTimeout` method to the `Adjust` API to allow retrieving the ADID with a specified timeout. If the value is not obtained in time, null is returned.
 - Added `getAttributionWithTimeout` method to the `Adjust` API to allow retrieving the current attribution information with a specified timeout. If the value is not obtained in time, null is returned.
+- Added the `resolveLinkWithUrl` method to the `Adjust` API to resolve the underlying Adjust link from other links that wrap Adjust links.
 - Added ability to disable the reading of the app set ID. You can do this by calling the `disableAppSetIdReading` method on your `AdjustConfig` instance.
 
 #### Changed
