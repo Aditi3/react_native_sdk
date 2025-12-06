@@ -158,7 +158,7 @@ Adjust.getLastDeeplink = function(callback) {
 };
 
 Adjust.getSdkVersion = function(callback) {
-    module_adjust.getSdkVersion("react-native5.4.4", callback);
+    module_adjust.getSdkVersion("react-native5.5.0", callback);
 };
 
 Adjust.componentWillUnmount = function() {
