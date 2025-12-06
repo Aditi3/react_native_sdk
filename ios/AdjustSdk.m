@@ -572,8 +572,71 @@ RCT_EXPORT_METHOD(getAttribution:(RCTResponseSenderBlock)callback) {
     }];
 }
 
+RCT_EXPORT_METHOD(getAttributionWithTimeout:(NSDictionary *)timeoutMap callback:(RCTResponseSenderBlock)callback) {
+    NSNumber *timeoutInMilliseconds = timeoutMap[@"timeoutInMilliseconds"];
+    if (![self isFieldValid:timeoutInMilliseconds]) {
+        if (callback) {
+            callback(@[[NSNull null]]);
+        }
+        return;
+    }
+    
+    NSInteger timeoutMs = [timeoutInMilliseconds integerValue];
+    [Adjust attributionWithTimeout:timeoutMs completionHandler:^(ADJAttribution * _Nullable attribution) {
+        if (callback) {
+            if (attribution == nil) {
+                callback(@[[NSNull null]]);
+                return;
+            }
+            
+            NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
+            [self addValueOrEmpty:dictionary key:@"trackerToken" value:attribution.trackerToken];
+            [self addValueOrEmpty:dictionary key:@"trackerName" value:attribution.trackerName];
+            [self addValueOrEmpty:dictionary key:@"network" value:attribution.network];
+            [self addValueOrEmpty:dictionary key:@"campaign" value:attribution.campaign];
+            [self addValueOrEmpty:dictionary key:@"creative" value:attribution.creative];
+            [self addValueOrEmpty:dictionary key:@"adgroup" value:attribution.adgroup];
+            [self addValueOrEmpty:dictionary key:@"clickLabel" value:attribution.clickLabel];
+            [self addValueOrEmpty:dictionary key:@"costType" value:attribution.costType];
+            [self addValueOrEmpty:dictionary key:@"costAmount" value:attribution.costAmount];
+            [self addValueOrEmpty:dictionary key:@"costCurrency" value:attribution.costCurrency];
+            if (attribution.jsonResponse != nil) {
+                NSData *dataJsonResponse = [NSJSONSerialization dataWithJSONObject:attribution.jsonResponse
+                                                                           options:0
+                                                                             error:nil];
+                NSString *stringJsonResponse = [[NSString alloc] initWithBytes:[dataJsonResponse bytes]
+                                                                        length:[dataJsonResponse length]
+                                                                      encoding:NSUTF8StringEncoding];
+                [self addValueOrEmpty:dictionary key:@"jsonResponse" value:stringJsonResponse];
+            }
+            callback(@[dictionary]);
+        }
+    }];
+}
+
 RCT_EXPORT_METHOD(getAdid:(RCTResponseSenderBlock)callback) {
     [Adjust adidWithCompletionHandler:^(NSString * _Nullable adid) {
+        if (callback) {
+            if (nil == adid) {
+                callback(@[[NSNull null]]);
+            } else {
+                callback(@[adid]);
+            }
+        }
+    }];
+}
+
+RCT_EXPORT_METHOD(getAdidWithTimeout:(NSDictionary *)timeoutMap callback:(RCTResponseSenderBlock)callback) {
+    NSNumber *timeoutInMilliseconds = timeoutMap[@"timeoutInMilliseconds"];
+    if (![self isFieldValid:timeoutInMilliseconds]) {
+        if (callback) {
+            callback(@[[NSNull null]]);
+        }
+        return;
+    }
+    
+    NSInteger timeoutMs = [timeoutInMilliseconds integerValue];
+    [Adjust adidWithTimeout:timeoutMs completionHandler:^(NSString * _Nullable adid) {
         if (callback) {
             if (nil == adid) {
                 callback(@[[NSNull null]]);

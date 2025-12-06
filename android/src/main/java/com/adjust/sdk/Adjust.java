@@ -283,6 +283,14 @@ public class Adjust extends ReactContextBaseJavaModule implements
             }
         }
 
+        // app set ID reading (Android only)
+        if (checkKey(mapConfig, "isAppSetIdReadingEnabled")) {
+            boolean isAppSetIdReadingEnabled = mapConfig.getBoolean("isAppSetIdReadingEnabled");
+            if (!isAppSetIdReadingEnabled) {
+                adjustConfig.disableAppSetIdReading();
+            }
+        }
+
         // store info 
         if (checkKey(mapConfig, "storeInfo")) {
             ReadableMap storeInfo = mapConfig.getMap("storeInfo");
@@ -773,6 +781,42 @@ public class Adjust extends ReactContextBaseJavaModule implements
     }
 
     @ReactMethod
+    public void getAttributionWithTimeout(final ReadableMap timeoutMap, final Callback callback) {
+        if (timeoutMap == null || !checkKey(timeoutMap, "timeoutInMilliseconds")) {
+            if (callback != null) {
+                callback.invoke((WritableMap) null);
+            }
+            return;
+        }
+
+        long timeoutInMilliseconds;
+        try {
+            timeoutInMilliseconds = (long) timeoutMap.getDouble("timeoutInMilliseconds");
+        } catch (Exception e) {
+            if (callback != null) {
+                callback.invoke((WritableMap) null);
+            }
+            return;
+        }
+
+        com.adjust.sdk.Adjust.getAttributionWithTimeout(
+            getReactApplicationContext(),
+            timeoutInMilliseconds,
+            new com.adjust.sdk.OnAttributionReadListener() {
+                @Override
+                public void onAttributionRead(AdjustAttribution attribution) {
+                    if (callback != null) {
+                        if (attribution == null) {
+                            callback.invoke((WritableMap) null);
+                        } else {
+                            callback.invoke(AdjustUtil.attributionToMap(attribution));
+                        }
+                    }
+                }
+            });
+    }
+
+    @ReactMethod
     public void getAdid(final Callback callback) {
         com.adjust.sdk.Adjust.getAdid(new com.adjust.sdk.OnAdidReadListener() {
             @Override
@@ -782,6 +826,38 @@ public class Adjust extends ReactContextBaseJavaModule implements
                 }
             }
         });
+    }
+
+    @ReactMethod
+    public void getAdidWithTimeout(final ReadableMap timeoutMap, final Callback callback) {
+        if (timeoutMap == null || !checkKey(timeoutMap, "timeoutInMilliseconds")) {
+            if (callback != null) {
+                callback.invoke((String) null);
+            }
+            return;
+        }
+
+        long timeoutInMilliseconds;
+        try {
+            timeoutInMilliseconds = (long) timeoutMap.getDouble("timeoutInMilliseconds");
+        } catch (Exception e) {
+            if (callback != null) {
+                callback.invoke((String) null);
+            }
+            return;
+        }
+
+        com.adjust.sdk.Adjust.getAdidWithTimeout(
+            getReactApplicationContext(),
+            timeoutInMilliseconds,
+            new com.adjust.sdk.OnAdidReadListener() {
+                @Override
+                public void onAdidRead(String adid) {
+                    if (callback != null) {
+                        callback.invoke(adid != null ? adid : null);
+                    }
+                }
+            });
     }
 
     @ReactMethod

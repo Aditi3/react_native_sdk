@@ -139,6 +139,14 @@ AdjustCommandExecutor.prototype.executeCommand = function(command, idx) {
         case 'verifyTrack': this.verifyTrack(command.params); break;
         case 'processDeeplink': this.processDeeplink(command.params); break;
         case 'attributionGetter': this.attributionGetter(command.params); break;
+        case 'adidGetter': this.adidGetter(command.params); break;
+        case 'adidGetterWithTimeout': this.adidGetterWithTimeout(command.params); break;
+        case 'attributionGetterWithTimeout': this.attributionGetterWithTimeout(command.params); break;
+        case 'idfaGetter': this.idfaGetter(command.params); break;
+        case 'idfvGetter': this.idfvGetter(command.params); break;
+        case 'googleAdIdGetter': this.googleAdIdGetter(command.params); break;
+        case 'amazonAdIdGetter': this.amazonAdIdGetter(command.params); break;
+        case 'sdkVersionGetter': this.sdkVersionGetter(command.params); break;
         case 'getLastDeeplink' : this.getLastDeeplink(command.params); break;
         case 'endFirstSessionDelay': this.endFirstSessionDelay(command.params); break;
         case 'coppaComplianceInDelay': this.coppaComplianceInDelay(command.params); break;
@@ -517,6 +525,22 @@ AdjustCommandExecutor.prototype.config = function(params) {
         var playStoreKidsEnabledS = getFirstParameterValue(params, 'playStoreKids');
         var playStoreKidsEnabled = playStoreKidsEnabledS == 'true';
         adjustConfig.enablePlayStoreKidsCompliance();
+    }
+
+    if (Platform.OS === 'android') {
+        if ('allowAppSetIdReading' in params) {
+            var allowAppSetIdReadingS = getFirstParameterValue(params, 'allowAppSetIdReading');
+            if (allowAppSetIdReadingS != 'true') {
+                adjustConfig.disableAppSetIdReading();
+            }
+        }
+        if ('appSetIdReadingEnabled' in params) {
+            var appSetIdReadingEnabledS = getFirstParameterValue(params, 'appSetIdReadingEnabled');
+            var appSetIdReadingEnabled = appSetIdReadingEnabledS?.toLowerCase() == 'true';
+            if (!appSetIdReadingEnabled) {
+                adjustConfig.disableAppSetIdReading();
+            }
+        }
     }
 };
 
@@ -935,9 +959,13 @@ AdjustCommandExecutor.prototype.trackAdRevenue = function(params) {
 };
 
 AdjustCommandExecutor.prototype.getLastDeeplink = function(params) {
+    var testCallbackId = getFirstParameterValue(params, 'testCallbackId');
     var _this = this;
     Adjust.getLastDeeplink(function(lastDeeplink) {
         AdjustSdkTest.addInfoToSend('last_deeplink', lastDeeplink);
+        if (testCallbackId) {
+            AdjustSdkTest.addInfoToSend('test_callback_id', testCallbackId);
+        }
         AdjustSdkTest.sendInfoToServer(_this.extraPath);
     });
 };
@@ -1059,7 +1087,42 @@ AdjustCommandExecutor.prototype.setExternalDeviceIdInDelay = function(params) {
     Adjust.setExternalDeviceIdInDelay(externalDeviceId);
 };
 
+AdjustCommandExecutor.prototype.adidGetter = function(params) {
+    var testCallbackId = getFirstParameterValue(params, 'testCallbackId');
+    var _this = this;
+    Adjust.getAdid(function(adid) {
+        AdjustSdkTest.addInfoToSend('adid', adid);
+        if (testCallbackId) {
+            AdjustSdkTest.addInfoToSend('test_callback_id', testCallbackId);
+        }
+        AdjustSdkTest.sendInfoToServer(_this.extraPath);
+    });
+};
+
+AdjustCommandExecutor.prototype.adidGetterWithTimeout = function(params) {
+    var timeoutStr = getFirstParameterValue(params, 'timeout');
+    var timeout = parseInt(timeoutStr);
+    var testCallbackId = getFirstParameterValue(params, 'testCallbackId');
+    var _this = this;
+    Adjust.getAdidWithTimeout(timeout, function(adid) {
+        if (adid != null) {
+            AdjustSdkTest.addInfoToSend('adid', adid);
+        } else {
+            if (Platform.OS === 'ios') {
+                AdjustSdkTest.addInfoToSend('adid', 'nil');
+            } else if (Platform.OS === 'android') {
+                AdjustSdkTest.addInfoToSend('adid', 'null');
+            }
+        }
+        if (testCallbackId) {
+            AdjustSdkTest.addInfoToSend('test_callback_id', testCallbackId);
+        }
+        AdjustSdkTest.sendInfoToServer(_this.extraPath);
+    });
+};
+
 AdjustCommandExecutor.prototype.attributionGetter = function(params) {
+    var testCallbackId = getFirstParameterValue(params, 'testCallbackId');
     var _this = this;
     Adjust.getAttribution(function(attribution) {
         AdjustSdkTest.addInfoToSend('tracker_token', attribution.trackerToken);
@@ -1081,8 +1144,135 @@ AdjustCommandExecutor.prototype.attributionGetter = function(params) {
         if (Platform.OS === 'ios') {
             delete attributionJsonResponse.fb_install_referrer;
         }
-        AdjustSdkTest.addInfoToSend('json_response', JSON.stringify(attributionJsonResponse)); 
+        AdjustSdkTest.addInfoToSend('json_response', JSON.stringify(attributionJsonResponse));
+        if (testCallbackId) {
+            AdjustSdkTest.addInfoToSend('test_callback_id', testCallbackId);
+        }
 
+        AdjustSdkTest.sendInfoToServer(_this.extraPath);
+    });
+};
+
+AdjustCommandExecutor.prototype.attributionGetterWithTimeout = function(params) {
+    var timeoutStr = getFirstParameterValue(params, 'timeout');
+    var timeout = parseInt(timeoutStr);
+    var testCallbackId = getFirstParameterValue(params, 'testCallbackId');
+    var _this = this;
+    Adjust.getAttributionWithTimeout(timeout, function(attribution) {
+        if (attribution != null) {
+            AdjustSdkTest.addInfoToSend('tracker_token', attribution.trackerToken);
+            AdjustSdkTest.addInfoToSend('tracker_name', attribution.trackerName);
+            AdjustSdkTest.addInfoToSend('network', attribution.network);
+            AdjustSdkTest.addInfoToSend('campaign', attribution.campaign);
+            AdjustSdkTest.addInfoToSend('adgroup', attribution.adgroup);
+            AdjustSdkTest.addInfoToSend('creative', attribution.creative);
+            AdjustSdkTest.addInfoToSend('click_label', attribution.clickLabel);
+            AdjustSdkTest.addInfoToSend('cost_type', attribution.costType);
+            AdjustSdkTest.addInfoToSend('cost_amount', attribution.costAmount.toString());
+            AdjustSdkTest.addInfoToSend('cost_currency', attribution.costCurrency);
+            AdjustSdkTest.addInfoToSend('fb_install_referrer', attribution.fbInstallReferrer);
+
+            if (attribution.jsonResponse != null && attribution.jsonResponse.length > 0) {
+                try {
+                    var rawJson = attribution.jsonResponse;
+                    if (rawJson.length > 0) {
+                        var jsonMap = JSON.parse(rawJson);
+                        if (Platform.OS === 'ios') {
+                            delete jsonMap.fb_install_referrer;
+                        }
+                        var jsonString = JSON.stringify(jsonMap);
+                        AdjustSdkTest.addInfoToSend('json_response', jsonString);
+                    }
+                } catch (e) {
+                    console.log("JSON Parsing Error: " + e);
+                }
+            }
+        } else {
+            if (Platform.OS === 'ios') {
+                AdjustSdkTest.addInfoToSend('attribution', 'nil');
+            } else if (Platform.OS === 'android') {
+                AdjustSdkTest.addInfoToSend('attribution', 'null');
+            }
+        }
+        if (testCallbackId) {
+            AdjustSdkTest.addInfoToSend('test_callback_id', testCallbackId);
+        }
+        AdjustSdkTest.sendInfoToServer(_this.extraPath);
+    });
+};
+
+AdjustCommandExecutor.prototype.idfaGetter = function(params) {
+    var testCallbackId = getFirstParameterValue(params, 'testCallbackId');
+    var _this = this;
+    if (Platform.OS === 'ios') {
+        Adjust.getIdfa(function(idfa) {
+            AdjustSdkTest.addInfoToSend('idfa', idfa);
+            if (testCallbackId) {
+                AdjustSdkTest.addInfoToSend('test_callback_id', testCallbackId);
+            }
+            AdjustSdkTest.sendInfoToServer(_this.extraPath);
+        });
+    } else {
+        console.log('[Adjust]: Error! IDFA is not available on this platform.');
+    }
+};
+
+AdjustCommandExecutor.prototype.idfvGetter = function(params) {
+    var testCallbackId = getFirstParameterValue(params, 'testCallbackId');
+    var _this = this;
+    if (Platform.OS === 'ios') {
+        Adjust.getIdfv(function(idfv) {
+            AdjustSdkTest.addInfoToSend('idfv', idfv);
+            if (testCallbackId) {
+                AdjustSdkTest.addInfoToSend('test_callback_id', testCallbackId);
+            }
+            AdjustSdkTest.sendInfoToServer(_this.extraPath);
+        });
+    } else {
+        console.log('[Adjust]: Error! IDFV is not available on this platform.');
+    }
+};
+
+AdjustCommandExecutor.prototype.googleAdIdGetter = function(params) {
+    var testCallbackId = getFirstParameterValue(params, 'testCallbackId');
+    var _this = this;
+    if (Platform.OS === 'android') {
+        Adjust.getGoogleAdId(function(googleAdId) {
+            AdjustSdkTest.addInfoToSend('gps_adid', googleAdId);
+            if (testCallbackId) {
+                AdjustSdkTest.addInfoToSend('test_callback_id', testCallbackId);
+            }
+            AdjustSdkTest.sendInfoToServer(_this.extraPath);
+        });
+    } else {
+        console.log('[Adjust]: Error! Google Advertising ID is not available on this platform.');
+    }
+};
+
+AdjustCommandExecutor.prototype.amazonAdIdGetter = function(params) {
+    var testCallbackId = getFirstParameterValue(params, 'testCallbackId');
+    var _this = this;
+    if (Platform.OS === 'android') {
+        Adjust.getAmazonAdId(function(amazonAdId) {
+            AdjustSdkTest.addInfoToSend('fire_adid', amazonAdId);
+            if (testCallbackId) {
+                AdjustSdkTest.addInfoToSend('test_callback_id', testCallbackId);
+            }
+            AdjustSdkTest.sendInfoToServer(_this.extraPath);
+        });
+    } else {
+        console.log('[Adjust]: Error! Amazon Fire Advertising ID is not available on this platform.');
+    }
+};
+
+AdjustCommandExecutor.prototype.sdkVersionGetter = function(params) {
+    var testCallbackId = getFirstParameterValue(params, 'testCallbackId');
+    var _this = this;
+    Adjust.getSdkVersion(function(sdkVersion) {
+        AdjustSdkTest.addInfoToSend('sdk_version', sdkVersion);
+        if (testCallbackId) {
+            AdjustSdkTest.addInfoToSend('test_callback_id', testCallbackId);
+        }
         AdjustSdkTest.sendInfoToServer(_this.extraPath);
     });
 };
