@@ -283,6 +283,14 @@ public class Adjust extends ReactContextBaseJavaModule implements
             }
         }
 
+        // app set ID reading (Android only)
+        if (checkKey(mapConfig, "isAppSetIdReadingEnabled")) {
+            boolean isAppSetIdReadingEnabled = mapConfig.getBoolean("isAppSetIdReadingEnabled");
+            if (!isAppSetIdReadingEnabled) {
+                adjustConfig.disableAppSetIdReading();
+            }
+        }
+
         // store info 
         if (checkKey(mapConfig, "storeInfo")) {
             ReadableMap storeInfo = mapConfig.getMap("storeInfo");
@@ -603,9 +611,15 @@ public class Adjust extends ReactContextBaseJavaModule implements
     @ReactMethod
     public void processAndResolveDeeplink(final ReadableMap mapDeeplink, final Callback callback) {
         if (mapDeeplink == null) {
+            if (callback != null) {
+                callback.invoke((String) null);
+            }
             return;
         }
         if (!checkKey(mapDeeplink, "deeplink")) {
+            if (callback != null) {
+                callback.invoke((String) null);
+            }
             return;
         }
 
@@ -622,9 +636,42 @@ public class Adjust extends ReactContextBaseJavaModule implements
             new OnDeeplinkResolvedListener() {
             @Override
             public void onDeeplinkResolved(String resolvedLink) {
-                callback.invoke(resolvedLink);
+                if (callback != null) {
+                    callback.invoke(resolvedLink);
+                }
             }
         });
+    }
+
+    @ReactMethod
+    public void resolveLinkWithUrl(final String url, final ReadableArray resolveUrlSuffixArray, final Callback callback) {
+        if (url == null) {
+            if (callback != null) {
+                callback.invoke((String) null);
+            }
+            return;
+        }
+        String[] suffixArray = null;
+        if (resolveUrlSuffixArray != null && resolveUrlSuffixArray.size() > 0) {
+            int n = resolveUrlSuffixArray.size();
+            suffixArray = new String[n];
+            for (int i = 0; i < n; i++) {
+                suffixArray[i] = resolveUrlSuffixArray.getString(i);
+            }
+        }
+        com.adjust.sdk.AdjustLinkResolution.resolveLink(
+            url,
+            suffixArray,
+            new com.adjust.sdk.AdjustLinkResolution.AdjustLinkResolutionCallback() {
+                @Override
+                public void resolvedLinkCallback(Uri resolvedLink) {
+                    if (callback != null) {
+                        String resolvedUrl = resolvedLink != null ? resolvedLink.toString() : null;
+                        callback.invoke(resolvedUrl);
+                    }
+                }
+            }
+        );
     }
 
     @ReactMethod
@@ -714,7 +761,9 @@ public class Adjust extends ReactContextBaseJavaModule implements
             new com.adjust.sdk.OnIsEnabledListener() {
             @Override
             public void onIsEnabledRead(boolean isEnabled) {
-                callback.invoke(isEnabled);
+                if (callback != null) {
+                    callback.invoke(isEnabled);
+                }
             }
         });
     }
@@ -724,9 +773,47 @@ public class Adjust extends ReactContextBaseJavaModule implements
         com.adjust.sdk.Adjust.getAttribution(new com.adjust.sdk.OnAttributionReadListener() {
             @Override
             public void onAttributionRead(AdjustAttribution attribution) {
-                callback.invoke(AdjustUtil.attributionToMap(attribution));
+                if (callback != null) {
+                    callback.invoke(AdjustUtil.attributionToMap(attribution));
+                }
             }
         });
+    }
+
+    @ReactMethod
+    public void getAttributionWithTimeout(final ReadableMap timeoutMap, final Callback callback) {
+        if (timeoutMap == null || !checkKey(timeoutMap, "timeoutInMilliseconds")) {
+            if (callback != null) {
+                callback.invoke((WritableMap) null);
+            }
+            return;
+        }
+
+        long timeoutInMilliseconds;
+        try {
+            timeoutInMilliseconds = (long) timeoutMap.getDouble("timeoutInMilliseconds");
+        } catch (Exception e) {
+            if (callback != null) {
+                callback.invoke((WritableMap) null);
+            }
+            return;
+        }
+
+        com.adjust.sdk.Adjust.getAttributionWithTimeout(
+            getReactApplicationContext(),
+            timeoutInMilliseconds,
+            new com.adjust.sdk.OnAttributionReadListener() {
+                @Override
+                public void onAttributionRead(AdjustAttribution attribution) {
+                    if (callback != null) {
+                        if (attribution == null) {
+                            callback.invoke((WritableMap) null);
+                        } else {
+                            callback.invoke(AdjustUtil.attributionToMap(attribution));
+                        }
+                    }
+                }
+            });
     }
 
     @ReactMethod
@@ -734,9 +821,43 @@ public class Adjust extends ReactContextBaseJavaModule implements
         com.adjust.sdk.Adjust.getAdid(new com.adjust.sdk.OnAdidReadListener() {
             @Override
             public void onAdidRead(String adid) {
-                callback.invoke(adid);
+                if (callback != null) {
+                    callback.invoke(adid != null ? adid : null);
+                }
             }
         });
+    }
+
+    @ReactMethod
+    public void getAdidWithTimeout(final ReadableMap timeoutMap, final Callback callback) {
+        if (timeoutMap == null || !checkKey(timeoutMap, "timeoutInMilliseconds")) {
+            if (callback != null) {
+                callback.invoke((String) null);
+            }
+            return;
+        }
+
+        long timeoutInMilliseconds;
+        try {
+            timeoutInMilliseconds = (long) timeoutMap.getDouble("timeoutInMilliseconds");
+        } catch (Exception e) {
+            if (callback != null) {
+                callback.invoke((String) null);
+            }
+            return;
+        }
+
+        com.adjust.sdk.Adjust.getAdidWithTimeout(
+            getReactApplicationContext(),
+            timeoutInMilliseconds,
+            new com.adjust.sdk.OnAdidReadListener() {
+                @Override
+                public void onAdidRead(String adid) {
+                    if (callback != null) {
+                        callback.invoke(adid != null ? adid : null);
+                    }
+                }
+            });
     }
 
     @ReactMethod
@@ -746,8 +867,10 @@ public class Adjust extends ReactContextBaseJavaModule implements
             new OnLastDeeplinkReadListener() {
             @Override
             public void onLastDeeplinkRead(Uri uri) {
-                String strUri = (uri != null) ? uri.toString() : "";
-                callback.invoke(strUri);
+                if (callback != null) {
+                    String strUri = (uri != null) ? uri.toString() : null;
+                    callback.invoke(strUri);
+                }
             }
         });
     }
@@ -757,10 +880,12 @@ public class Adjust extends ReactContextBaseJavaModule implements
         com.adjust.sdk.Adjust.getSdkVersion(new com.adjust.sdk.OnSdkVersionReadListener() {
             @Override
             public void onSdkVersionRead(String sdkVersion) {
-                if (sdkVersion == null) {
-                    callback.invoke("");
-                } else {
-                    callback.invoke(sdkPrefix + "@" + sdkVersion);
+                if (callback != null) {
+                    if (sdkVersion == null) {
+                        callback.invoke((String) null);
+                    } else {
+                        callback.invoke(sdkPrefix + "@" + sdkVersion);
+                    }
                 }
             }
         });
@@ -889,6 +1014,10 @@ public class Adjust extends ReactContextBaseJavaModule implements
     @ReactMethod
     public void verifyPlayStorePurchase(final ReadableMap mapEvent, final Callback callback) {
         if (mapEvent == null) {
+            if (callback != null) {
+                WritableMap map = Arguments.createMap();
+                callback.invoke(map);
+            }
             return;
         }
 
@@ -934,6 +1063,10 @@ public class Adjust extends ReactContextBaseJavaModule implements
     @ReactMethod
     public void verifyAndTrackPlayStorePurchase(final ReadableMap mapEvent, final Callback callback) {
         if (mapEvent == null) {
+            if (callback != null) {
+                WritableMap map = Arguments.createMap();
+                callback.invoke(map);
+            }
             return;
         }
 
@@ -1068,7 +1201,9 @@ public class Adjust extends ReactContextBaseJavaModule implements
             new com.adjust.sdk.OnGoogleAdIdReadListener() {
             @Override
             public void onGoogleAdIdRead(String googleAdId) {
-                callback.invoke(googleAdId);
+                if (callback != null) {
+                    callback.invoke(googleAdId);
+                }
             }
         });
     }
@@ -1080,7 +1215,9 @@ public class Adjust extends ReactContextBaseJavaModule implements
             new com.adjust.sdk.OnAmazonAdIdReadListener() {
             @Override
             public void onAmazonAdIdRead(String amazonAdId) {
-                callback.invoke(amazonAdId);
+                if (callback != null) {
+                    callback.invoke(amazonAdId);
+                }
             }
         });
     }

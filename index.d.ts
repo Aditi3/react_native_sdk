@@ -91,6 +91,7 @@ declare module 'react-native-adjust' {
     public disableIdfvReading(): void
     public disableSkanAttribution(): void
     public disableAppTrackingTransparencyUsage(): void
+    public disableAppSetIdReading(): void
     public setEventDeduplicationIdsMaxSize(eventDeduplicationIdsMaxSize: number): void
     public setAttConsentWaitingInterval(attConsentWaitingInterval: number): void
     public setUrlStrategy(urlStrategyDomains: string[], useSubdomains: boolean, isDataResidency: boolean): void
@@ -227,21 +228,24 @@ declare module 'react-native-adjust' {
     getIdfa: (callback: (idfa: string | null) => void) => void
     getIdfv: (callback: (idfv: string | null) => void) => void
     getGoogleAdId: (callback: (adid: string | null) => void) => void
-    getAdid: (callback: (adid: string) => void) => void
+    getAdid: (callback: (adid: string | null) => void) => void
+    getAdidWithTimeout: (timeoutInMilliseconds: number, callback: (adid: string | null) => void) => void
     getAttribution: (callback: (attribution: AdjustAttribution) => void) => void
+    getAttributionWithTimeout: (timeoutInMilliseconds: number, callback: (attribution: AdjustAttribution | null) => void) => void
     getAmazonAdId: (callback: (adid: string | null) => void) => void
-    getSdkVersion: (callback: (sdkVersion: string) => void) => void
+    getSdkVersion: (callback: (sdkVersion: string | null) => void) => void
     requestAppTrackingAuthorization: (handler: (status: number) => void) => void
     updateSkanConversionValue: (conversionValue: number, coarseValue: string, lockWindow: boolean, callback: (error: string | null) => void) => void
     getAppTrackingAuthorizationStatus: (callback: (status: number) => void) => void
     trackThirdPartySharing: (adjustThirdPartySharing: AdjustThirdPartySharing) => void
     trackMeasurementConsent: (measurementConsent: boolean) => void
-    getLastDeeplink: (callback: (lastDeeplink: string) => void) => void
+    getLastDeeplink: (callback: (lastDeeplink: string | null) => void) => void
     verifyAppStorePurchase: (purchase: AdjustAppStorePurchase, callback: (verificationResult: AdjustPurchaseVerificationResult) => void) => void
     verifyAndTrackAppStorePurchase: (adjustEvent: AdjustEvent, callback: (verificationResult: AdjustPurchaseVerificationResult) => void) => void
     verifyPlayStorePurchase: (purchase: AdjustPlayStorePurchase, callback: (verificationResult: AdjustPurchaseVerificationResult) => void) => void
     verifyAndTrackPlayStorePurchase: (adjustEvent: AdjustEvent, callback: (verificationResult: AdjustPurchaseVerificationResult) => void) => void
-    processAndResolveDeeplink: (adjustDeeplink: AdjustDeeplink, callback: (resolvedLink: string) => void) => void
+    processAndResolveDeeplink: (adjustDeeplink: AdjustDeeplink, callback: (resolvedLink: string | null) => void) => void
+    resolveLinkWithUrl: (url: string, resolveUrlSuffixArray: string[], callback: (resolvedLink: string | null) => void) => void
     endFirstSessionDelay: () => void
     enableCoppaComplianceInDelay: () => void
     disableCoppaComplianceInDelay: () => void

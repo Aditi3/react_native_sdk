@@ -53,6 +53,10 @@ Adjust.processAndResolveDeeplink = function(adjustDeeplink, callback) {
     module_adjust.processAndResolveDeeplink(adjustDeeplink, callback);
 };
 
+Adjust.resolveLinkWithUrl = function(url, resolveUrlSuffixArray, callback) {
+    module_adjust.resolveLinkWithUrl(url, resolveUrlSuffixArray, callback);
+};
+
 Adjust.setPushToken = function(token) {
     if (typeof token !== 'string') {
         console.log("[Adjust] Push token is not of type string");
@@ -145,8 +149,16 @@ Adjust.getAttribution = function(callback) {
     module_adjust.getAttribution(callback);
 };
 
+Adjust.getAttributionWithTimeout = function(timeoutInMilliseconds, callback) {
+    module_adjust.getAttributionWithTimeout({timeoutInMilliseconds: timeoutInMilliseconds}, callback);
+};
+
 Adjust.getAdid = function(callback) {
     module_adjust.getAdid(callback);
+};
+
+Adjust.getAdidWithTimeout = function(timeoutInMilliseconds, callback) {
+    module_adjust.getAdidWithTimeout({timeoutInMilliseconds: timeoutInMilliseconds}, callback);
 };
 
 Adjust.getLastDeeplink = function(callback) {
@@ -154,7 +166,7 @@ Adjust.getLastDeeplink = function(callback) {
 };
 
 Adjust.getSdkVersion = function(callback) {
-    module_adjust.getSdkVersion("react-native5.4.4", callback);
+    module_adjust.getSdkVersion("react-native5.5.0", callback);
 };
 
 Adjust.componentWillUnmount = function() {
@@ -329,7 +341,7 @@ Adjust.teardown = function(testParam) {
 
 var AdjustConfig = function(appToken, environment) {
     // common
-    this.sdkPrefix = "react-native5.4.4";
+    this.sdkPrefix = "react-native5.5.0";
     this.appToken = appToken;
     this.environment = environment;
     this.logLevel = null;
@@ -545,6 +557,11 @@ AdjustConfig.prototype.enableLinkMe = function() {
 
 AdjustConfig.prototype.disableAppTrackingTransparencyUsage = function() {
     this.isAppTrackingTransparencyUsageEnabled = false;
+};
+
+// android only
+AdjustConfig.prototype.disableAppSetIdReading = function() {
+    this.isAppSetIdReadingEnabled = false;
 };
 
 AdjustConfig.prototype.setAttConsentWaitingInterval = function(attConsentWaitingInterval) {
