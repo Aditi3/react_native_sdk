@@ -603,9 +603,15 @@ public class Adjust extends ReactContextBaseJavaModule implements
     @ReactMethod
     public void processAndResolveDeeplink(final ReadableMap mapDeeplink, final Callback callback) {
         if (mapDeeplink == null) {
+            if (callback != null) {
+                callback.invoke((String) null);
+            }
             return;
         }
         if (!checkKey(mapDeeplink, "deeplink")) {
+            if (callback != null) {
+                callback.invoke((String) null);
+            }
             return;
         }
 
@@ -622,7 +628,9 @@ public class Adjust extends ReactContextBaseJavaModule implements
             new OnDeeplinkResolvedListener() {
             @Override
             public void onDeeplinkResolved(String resolvedLink) {
-                callback.invoke(resolvedLink);
+                if (callback != null) {
+                    callback.invoke(resolvedLink);
+                }
             }
         });
     }
@@ -631,7 +639,7 @@ public class Adjust extends ReactContextBaseJavaModule implements
     public void resolveLinkWithUrl(final String url, final ReadableArray resolveUrlSuffixArray, final Callback callback) {
         if (url == null) {
             if (callback != null) {
-                callback.invoke("");
+                callback.invoke((String) null);
             }
             return;
         }
@@ -649,8 +657,10 @@ public class Adjust extends ReactContextBaseJavaModule implements
             new com.adjust.sdk.AdjustLinkResolution.AdjustLinkResolutionCallback() {
                 @Override
                 public void resolvedLinkCallback(Uri resolvedLink) {
-                    String resolvedUrl = resolvedLink != null ? resolvedLink.toString() : "";
-                    callback.invoke(resolvedUrl);
+                    if (callback != null) {
+                        String resolvedUrl = resolvedLink != null ? resolvedLink.toString() : null;
+                        callback.invoke(resolvedUrl);
+                    }
                 }
             }
         );
@@ -743,7 +753,9 @@ public class Adjust extends ReactContextBaseJavaModule implements
             new com.adjust.sdk.OnIsEnabledListener() {
             @Override
             public void onIsEnabledRead(boolean isEnabled) {
-                callback.invoke(isEnabled);
+                if (callback != null) {
+                    callback.invoke(isEnabled);
+                }
             }
         });
     }
@@ -753,7 +765,9 @@ public class Adjust extends ReactContextBaseJavaModule implements
         com.adjust.sdk.Adjust.getAttribution(new com.adjust.sdk.OnAttributionReadListener() {
             @Override
             public void onAttributionRead(AdjustAttribution attribution) {
-                callback.invoke(AdjustUtil.attributionToMap(attribution));
+                if (callback != null) {
+                    callback.invoke(AdjustUtil.attributionToMap(attribution));
+                }
             }
         });
     }
@@ -763,7 +777,9 @@ public class Adjust extends ReactContextBaseJavaModule implements
         com.adjust.sdk.Adjust.getAdid(new com.adjust.sdk.OnAdidReadListener() {
             @Override
             public void onAdidRead(String adid) {
-                callback.invoke(adid);
+                if (callback != null) {
+                    callback.invoke(adid != null ? adid : null);
+                }
             }
         });
     }
@@ -775,8 +791,10 @@ public class Adjust extends ReactContextBaseJavaModule implements
             new OnLastDeeplinkReadListener() {
             @Override
             public void onLastDeeplinkRead(Uri uri) {
-                String strUri = (uri != null) ? uri.toString() : "";
-                callback.invoke(strUri);
+                if (callback != null) {
+                    String strUri = (uri != null) ? uri.toString() : null;
+                    callback.invoke(strUri);
+                }
             }
         });
     }
@@ -786,10 +804,12 @@ public class Adjust extends ReactContextBaseJavaModule implements
         com.adjust.sdk.Adjust.getSdkVersion(new com.adjust.sdk.OnSdkVersionReadListener() {
             @Override
             public void onSdkVersionRead(String sdkVersion) {
-                if (sdkVersion == null) {
-                    callback.invoke("");
-                } else {
-                    callback.invoke(sdkPrefix + "@" + sdkVersion);
+                if (callback != null) {
+                    if (sdkVersion == null) {
+                        callback.invoke((String) null);
+                    } else {
+                        callback.invoke(sdkPrefix + "@" + sdkVersion);
+                    }
                 }
             }
         });
@@ -918,6 +938,10 @@ public class Adjust extends ReactContextBaseJavaModule implements
     @ReactMethod
     public void verifyPlayStorePurchase(final ReadableMap mapEvent, final Callback callback) {
         if (mapEvent == null) {
+            if (callback != null) {
+                WritableMap map = Arguments.createMap();
+                callback.invoke(map);
+            }
             return;
         }
 
@@ -963,6 +987,10 @@ public class Adjust extends ReactContextBaseJavaModule implements
     @ReactMethod
     public void verifyAndTrackPlayStorePurchase(final ReadableMap mapEvent, final Callback callback) {
         if (mapEvent == null) {
+            if (callback != null) {
+                WritableMap map = Arguments.createMap();
+                callback.invoke(map);
+            }
             return;
         }
 
@@ -1097,7 +1125,9 @@ public class Adjust extends ReactContextBaseJavaModule implements
             new com.adjust.sdk.OnGoogleAdIdReadListener() {
             @Override
             public void onGoogleAdIdRead(String googleAdId) {
-                callback.invoke(googleAdId);
+                if (callback != null) {
+                    callback.invoke(googleAdId);
+                }
             }
         });
     }
@@ -1109,7 +1139,9 @@ public class Adjust extends ReactContextBaseJavaModule implements
             new com.adjust.sdk.OnAmazonAdIdReadListener() {
             @Override
             public void onAmazonAdIdRead(String amazonAdId) {
-                callback.invoke(amazonAdId);
+                if (callback != null) {
+                    callback.invoke(amazonAdId);
+                }
             }
         });
     }
